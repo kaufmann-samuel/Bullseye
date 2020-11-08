@@ -16,11 +16,10 @@ import SwiftUI
 */
  struct ContentView: View {
     
-    @State private var isVisibleGame = false
-    
     //@State private var isVisibleKnock: Bool = false
-    
+    @State private var isVisibleGame = false
     @State private var willMoveToNextScreen = false
+    //@ObservedObject var leaderboardView = LeaderboardView()
     
     /*
     @State var jokeList = ["Samuel kauft Mann",
@@ -42,21 +41,21 @@ import SwiftUI
     }
     */
     var body: some View {
-/*
-        NavigationView {
-                .navigationBarTitle("")
-                .navigationBarHidden(true)
- */
+
+        //NavigationView {
+ 
         VStack {
             
             Text("The worst iOS App ever")
-                .padding(.bottom).font(.largeTitle)
-            
+                .font(.largeTitle)
+            Text("Copyright Samuel Kaufmann©")
+                .font(.custom("", size: 15))
+                .padding(.bottom)
         Button(action: {
             print("Start Game tapped!"); isVisibleGame = true;
             }) {
             HStack {
-                    Image(systemName: "trash")
+                    Image(systemName: "play")
                         .font(.title)
                                     Text("Start Bullseye!")
                                         .fontWeight(.semibold)
@@ -102,10 +101,11 @@ import SwiftUI
                 Alert(title: Text("Joke"), message: Text("Insert Joke here"), dismissButton: .default(Text("Ok")))
             }
             */
-        }.navigate(to: ContentViewGame(), when: $willMoveToNextScreen)
-    }
+        }
+        .navigate(to: ContentViewGame(), when: $willMoveToNextScreen)
+    //}
  }
-//}
+}
 
 
 extension View {
@@ -118,13 +118,16 @@ extension View {
         NavigationView {
             ZStack {
                 self
+                    
                     .navigationBarTitle("")
                     .navigationBarHidden(true)
 
                 NavigationLink(
                     destination: view
+                    
                         .navigationBarTitle("")
                         .navigationBarHidden(true),
+                    
                     isActive: binding
                 ) {
                     EmptyView()
@@ -142,11 +145,20 @@ struct ContentViewGame : View {
     @State private var alertIsVisible = false
     @State private var totalScore = 0
     @State private var rounds = 0
-    @State private var willMoveToInfo = false;
+    @State private var willMoveToLeaderboard = false
+
+    func sliderValueRounded() -> Int {
+        return Int(sliderValue.rounded())
+    }
+    
+    func pointsForCurrentRound() -> Int {
+        return 100 - abs(hitNumber - sliderValueRounded())
+    }
     
         var body: some View {
-            NavigationView {
+
                 VStack {
+                    
                     // Header Row
                     HStack {
                         Text("Treffe die Zahl mit dem Schieber:")
@@ -175,6 +187,7 @@ struct ContentViewGame : View {
                             self.rounds += 1
                         })
                     }
+                    Spacer()
                     // Slider Row
                     HStack {
                         Text("1")
@@ -184,13 +197,12 @@ struct ContentViewGame : View {
                     // Try Again Button Row
                     HStack {
                         Button(action: { print("Try Again Button Pressed!"); totalScore = 0; rounds = 0; self.hitNumber = Int.random(in: 1...200); sliderValue = 100.0}, label: {
-                            Text("Zurücksetzten")
+                            Text("Zurücksetzen")
                                 //.fontWeight(.semibold)
                                 .font(.body)
                         })
                     }
-                    Text("Copyright Samuel Kaufmann©")
-                        .padding(30)
+                    Spacer()
                     // Score Row
                     HStack {
                         Text("Punkte:")
@@ -199,36 +211,53 @@ struct ContentViewGame : View {
                         Text("Runden:")
                         Text("\(rounds)")
                         Spacer()
-                        Button(action: { print("Info Button Pressed!")}, label: {
-                            Text("Info")
+                        /*
+                        Button(action: { print("Leaderboard Button Pressed!"); willMoveToLeaderboard = true}, label: {
+                            Text("Rangliste")
                         })
-                            
+                        */
+                        NavigationLink(
+                            destination: ScoreView(),
+                            label: {
+                                Text("Rangliste")
+                            })
+                            .navigationBarTitle("Rangliste")
+                            .navigationBarHidden(true)
                     }
                     .padding(.top, 20)
                     .padding()
-                }.navigationBarTitle("")
+                }//.navigate(to: ContentLeaderboardView(), when: $willMoveToLeaderboard)
+                .navigationBarTitle("")
                 .navigationBarHidden(true)
-            }//.navigate(to: InfoView, when: $willMoveToInfo)
-        }
-    
-    func sliderValueRounded() -> Int {
-        return Int(sliderValue.rounded())
-    }
-    
-    func pointsForCurrentRound() -> Int {
-        return 100 - abs(hitNumber - sliderValueRounded())
-    }
-    
-}
-
-/*
-struct InfoView : View {
-    var body: some View {
-        NavigationView {
-            HStack{
-                Text("Info Page")
+                
+                /*
+                func sliderValueRounded() -> Int {
+                    return Int(sliderValue.rounded())
+                }
+                
+                func pointsForCurrentRound() -> Int {
+                    return 100 - abs(hitNumber - sliderValueRounded())
+                }
+                */
+                
             }
         }
+
+
+
+/*
+struct ContentLeaderboardView : View {
+    var body: some View {
+        NavigationView {
+            VStack{
+                Text("Rangliste")
+
+                Text("Bottom")
+            }
+            
+        }
+        .navigationBarTitle(Text("Zurück"))
+        .navigationBarHidden(false)
     }
 }
 */
